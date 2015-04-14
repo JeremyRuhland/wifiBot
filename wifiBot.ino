@@ -17,7 +17,14 @@
 #define PASSWORD "SecretPassword"
 #define CHAN 11
 
+// Copied from 404.html
+const uint8_t PROGMEM htmlPage404[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><title>wifiBot</title><style type=\"text/css\">body{background-color: #CD5C5C;}div.r{position: relative; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 75px; background: #FFFFFF; opacity: 0.6; width: 500px; height: 500px;}div.r p{position: relative; left: 85%; top: 50%; transform: translate(-50%, -50%); color: #000000; font-size: 400px; font-weight: bold; font-family: serif;}</style><body> <div class=\"r\"> <p>!</p></div></body></html>";
+
+// Copied from index.html
+const uint8_t PROGMEM htmlPageIndex[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body>Hello World!</body></html>";
+
 // Function prototypes
+void sendFromMemory(const uint8_t str[]);
 void sendIndex(uint8_t);
 void send404(uint8_t);
 
@@ -189,17 +196,31 @@ void robotLightsOff(void) {
 }
 
 /**
+ * sendFromMemory
+ *
+ * Sends a sting over serial from flash memory using minimal RAM.
+ *
+ * @param str PROGMEM string in flash memory
+ */
+void sendFromMemory(const uint8_t str[]) {
+    uint8_t c;
+    
+    while (str) {
+        while ((c = pgm_read_byte(str++))) {
+            Serial1.print(c);
+        }
+    }
+}
+
+/**
  * sendIndex
  *
  * @param muxId ID of mux channel to send reply to
  *
  * Send index page to esp8266
  */
-void sendIndex(uint8_t muxId) {
-    // Copied from index.html
-    uint8_t message[] = {"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body>Hello World!</body></html>"};
-    
-    wifi.send(muxId, message, sizeof(message));
+void sendIndex(uint8_t muxId) {  
+    wifi.sendFromFlash(muxId, htmlPageIndex, sizeof(htmlPageIndex));
 }
 
 /**
@@ -210,8 +231,5 @@ void sendIndex(uint8_t muxId) {
  * Send 404 page to esp8266
  */
 void send404(uint8_t muxId) {
-    // Copied from 404.html
-    uint8_t message[] = {"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body>404 Error, boo.</body></html>"};
-    
-    wifi.send(muxId, message, sizeof(message));
+    wifi.sendFromFlash(muxId, htmlPage404, sizeof(htmlPage404));
 }
