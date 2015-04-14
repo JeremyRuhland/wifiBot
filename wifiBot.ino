@@ -5,7 +5,7 @@
  * Arachnio will become a password protected wifi access point with a
  * self-hosted http server allowing remote control of the robot.
  *
- * Uses ESP8266 library from http://github.com/itead/ITEADLIB_Arduino_WeeESP8266
+ * Uses ESP8266 library from http://github.com/JeremyRuhland/ITEADLIB_Arduino_WeeESP8266
  *
  * @author Jeremy Ruhland <jeremy ( a t ) goopypanther.org>
  */
@@ -24,7 +24,6 @@ const uint8_t PROGMEM htmlPage404[] = "HTTP/1.1 200 OK\r\nContent-Type: text/htm
 const uint8_t PROGMEM htmlPageIndex[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body>Hello World!</body></html>";
 
 // Function prototypes
-void sendFromMemory(const uint8_t str[]);
 void sendIndex(uint8_t);
 void send404(uint8_t);
 
@@ -39,6 +38,9 @@ void robotLightsOff(void);
 ESP8266 wifi(Serial1);
 
 void setup() {
+    bool wifiStatus;
+    uint8_t wifiErrors = 0;
+    
     // Set up motors
     pinMode(2, OUTPUT); // Left motor A
     pinMode(3, OUTPUT); // Left motor B
@@ -46,17 +48,44 @@ void setup() {
     pinMode(5, OUTPUT); // Right motor B
     
     pinMode(A5, OUTPUT); // LED lights
+    pinMode(13, OUTPUT); // Status LED
    
     // Set up wifi AP in WPA/WPA2 PSK mode
-    (void) wifi.setOprToStationSoftAP();
-    (void) wifi.setSoftAPParam(SSID, PASSWORD, CHAN, 4);
-    delay(8000);
+    wifiStatus = wifi.setOprToStationSoftAP();
+    if (!wifiStatus) {
+        wifiErrors++;
+    } else {}
     
-    (void) wifi.enableMUX(); // Mux mode
+    wifiStatus = wifi.setSoftAPParam(SSID, PASSWORD, CHAN, 4);
+    if (!wifiStatus) {
+        wifiErrors++;
+    } else {}
+    delay(2000);
+    
+    wifiStatus = wifi.enableMUX(); // Mux mode
+    if (!wifiStatus) {
+        wifiErrors++;
+    } else {}
     delay(100);
     
-    (void) wifi.startTCPServer(80); // Start server on port 80
-    (void) wifi.setTCPServerTimeout(10);
+    wifiStatus = wifi.startTCPServer(80); // Start server on port 80
+    if (!wifiStatus) {
+        wifiErrors++;
+    } else {}
+    
+    wifiStatus = wifi.setTCPServerTimeout(10);
+    if (!wifiStatus) {
+        wifiErrors++;
+    } else {}
+    
+    if (wifiErrors > 0) {
+        for (;;) {} // Trap forever, error state
+    } else {
+        // Blink lights to signal successful startup
+        robotLightsOn();
+        delay(2000);
+        robotLightsOff();
+    }
 }
 
 void loop() {
@@ -115,10 +144,10 @@ void loop() {
                     send404(muxId);
                     break;
             }
+            
+            wifi.releaseTCP(muxId); // Release TCP connection
         } else {}
     } else {}
-
-    wifi.releaseTCP(muxId); // Release TCP connection
 }
 
 /**
@@ -193,23 +222,6 @@ void robotLightsOn(void) {
  */
 void robotLightsOff(void) {
     digitalWrite(A5, LOW);
-}
-
-/**
- * sendFromMemory
- *
- * Sends a sting over serial from flash memory using minimal RAM.
- *
- * @param str PROGMEM string in flash memory
- */
-void sendFromMemory(const uint8_t str[]) {
-    uint8_t c;
-    
-    while (str) {
-        while ((c = pgm_read_byte(str++))) {
-            Serial1.print(c);
-        }
-    }
 }
 
 /**
