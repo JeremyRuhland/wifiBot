@@ -1,44 +1,97 @@
-<--
-http://stackoverflow.com/questions/4472891/how-can-i-disable-zoom-on-a-mobile-web-page
-http://stackoverflow.com/questions/11144370/using-mousedown-event-on-mobile-without-jquery-mobile
->
 <html>
-<meta content='width=device-width, initial-scale=0.1, maximum-scale=0.1, user-scalable=0' name='viewport' />
+<meta content='width=device-width, initial-scale=0.5, maximum-scale=0.5, user-scalable=0' name='viewport'/>
 <title>wifiBot</title>
 <style type="text/css">
-.box {
-  display: inline-block;
-  width: 200px; height: 200px;
-  background-color: #EEE;
-  margin: 1em;
-  border-radius: 75px;
+td {
+	display: inline-block;
+	width: 200px;
+	height: 200px;
+	background-color: #0005CA;
+	margin: 1em;
+	border-radius: 75px;
+	text-align: center;
+    vertical-align: middle;
+    line-height: 200px;
 }
 
-.box:active {
-  background-color: #000000;
+.button:active {
+	background-color: #00C96E;
 }
 
 body {
-  -webkit-touch-callout:none;
-  -webkit-user-select:none;
-  -khtml-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  user-select:none;
-  -webkit-tap-highlight-color:rgba(0,0,0,0);
+	-webkit-touch-callout:none;
+	-webkit-user-select:none;
+	-khtml-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
+	-webkit-tap-highlight-color:rgba(0,0,0,0);
+	background-color: #0071C0;
+}
+
+a {
+	color: white;
+}
+
+table {
+    position: relative;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%, 25%);
+    
+	color: white;
+    font-weight: bold;
+    font-family: serif;
 }
 </style>
+<script>
+d = document.createElement("img");
+
+function fwd() {
+    d.src = "1"
+}
+
+function bak() {
+    d.src = "2"
+}
+
+function lft() {
+    d.src = "4"
+}
+
+function rht() {
+    d.src = "3"
+}
+
+function stp() {
+    d.src = "5"
+}
+
+function on() {
+    d.src = "6"
+}
+
+function off() {
+    d.src = "7"
+}
+</script>
 <body>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
-  <p>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
-  <p>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
-  <div class='box'>hi</div>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+		<td><a href="http://github.com/JeremyRuhland/wifiBot">wifiBot</a></td>
+		<td class="button" ontouchstart="fwd()" ontouchend="stp()">^</td>
+		<td><a href="http://www.kickstarter.com/projects/logos-electro/arachnio">Arachnio</a></td>
+</tr>
+<tr>
+		<td class="button" ontouchstart="lft()" ontouchend="stp()"><</td>
+		<td class="button" ontouchstart="stp()">Stop</td>
+		<td class="button" ontouchstart="rht()" ontouchend="stp()">></td>
+</tr>
+<tr>
+		<td class="button" ontouchstart="off()">Lights Off</td>
+		<td class="button" ontouchstart="bak()" ontouchend="stp()">v</td>
+		<td class="button" ontouchstart="on()">Lights On</td>
+</tr>
+</table>
 </body>
 </html>
